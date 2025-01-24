@@ -43,13 +43,18 @@ function App() {
   const newGame = () => {
     //embaralha as cartas
 
+    const cardCopy = cardStock.map( card => {
+      const cardCpy = {...card};
+      return cardCpy;
+    })
+
 		const cardCopies = cardStock.map( card => { 
 			const cardCopy = { ...card };
 			cardCopy.id += cardStock.length; // Garantindo que cópias terão id único
 			return cardCopy;
 		}) 
 
-    const shuffledCards = [...cardStock, ...cardCopies].sort(() => Math.random() - 0.5);
+    const shuffledCards = [...cardCopy, ...cardCopies].sort(() => Math.random() - 0.5);
 
     // Resetando as variáveis de estado para começar um novo jogo
     setChoiceOne(null)
