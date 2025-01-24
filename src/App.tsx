@@ -2,11 +2,16 @@ import { useEffect, useState } from 'react'
 import './App.css'
 import SingleCard from './components/SingleCard.tsx'
 
+type Player = number;
+
+type Score = [number, number];
+
 interface Card {
   src: string;
   matched: boolean;
   id: number;
 }
+
 
 const cardImages: Card[] = [
   { src: "./img/bandeira.png", matched: false, id: 1},
@@ -23,8 +28,8 @@ const cardImages: Card[] = [
 function App() {
   const [cards, setCards] = useState<Card[]>([])
   const [turns, setTurns] = useState<number>(0)
-  const [playerTurn, setPlayerTurn] = useState<number>(1) // Para alternar entre jogador 1 e 2
-  const [score, setScore] = useState<{ player1: number, player2: number }>({ player1: 0, player2: 0 }) // Para armazenar a pontuação dos jogadores
+  const [playerTurn, setPlayerTurn] = useState<Player>(1) // Para alternar entre jogador 1 e 2
+  const [score, setScore] = useState<Score>([0, 0]) // Para armazenar a pontuação dos jogadores
   const [choiceOne, setChoiceOne] = useState<Card | null>(null)
   const [choiceTwo, setChoiceTwo] = useState<Card | null>(null)
   const [disabled, setDisabled] = useState<boolean>(false)
@@ -32,17 +37,17 @@ function App() {
   // Função para embaralhar as cartas e resetar o estado do jogo
   const newGame = () => {
     //embaralha as cartas
-    const shuffleCards = [...cardImages, ...cardImages]
+    const shuffledCards = [...cardImages, ...cardImages]
       .sort(() => Math.random() - 0.5)
       .map((card) => ({ ...card, id: Math.random() }))
 
     // Resetando as variáveis de estado para começar um novo jogo
     setChoiceOne(null)
     setChoiceTwo(null)
-    setCards(shuffleCards)
+    setCards(shuffledCards)
     setTurns(0)
     setPlayerTurn(1) // Jogador 1 começa após cada novo jogo
-    setScore({ player1: 0, player2: 0 }) // Resetando a pontuação dos jogadores
+    setScore([0, 0]) // Resetando a pontuação dos jogadores
   }
 
   //Seleção de Cartas nas variaveis de estado choice one ou two
@@ -68,8 +73,8 @@ function App() {
 
         // Aumenta a pontuação do jogador atual
         setScore(prevScore => {
-          const currentPlayer = playerTurn === 1 ? 'player1' : 'player2';
-          return { ...prevScore, [currentPlayer]: prevScore[currentPlayer] + 1 }
+					prevScore[playerTurn]++;
+          return prevScore;
         })
 
         // O jogador continua no mesmo turno se acertar
@@ -123,8 +128,8 @@ function App() {
       </div>
 
       <div className="scoreboard">
-        <p>Jogador 1: {score.player1}</p>
-        <p>Jogador 2: {score.player2}</p>
+        <p>Jogador 1: {score[0]}</p>
+        <p>Jogador 2: {score[1]}</p>
       </div>
     </div>
   )
