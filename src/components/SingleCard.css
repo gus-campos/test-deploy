@@ -13,6 +13,10 @@
   border-radius: 50%;
 }
 
+.card[data-odd="false"] {
+  animation-delay: 1.5s; /* Ajuste para iniciar no "meio" da animação */
+}
+
 /* front */
 .card .front {
   opacity: 0;
@@ -42,9 +46,7 @@
 
 
 /* tentei fazer a animação ser diferente pra cartas impares pra n ficar muito estranho mas não funcionou */
-div.card:nth-child(odd){
-  animation-direction: reverse;
-}
+
 
 @keyframes bounce {
   0%, 100%{
