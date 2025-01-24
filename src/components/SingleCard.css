@@ -1,0 +1,56 @@
+.card {
+  width: 100px;
+  height: 100px;
+  transition: transform 0.3s ease;
+  animation: bounce 3s linear infinite;
+  position: relative; /* Necessário para o posicionamento absoluto da frente e verso */
+}
+
+.card img {
+  width: 100%;
+  display: block;
+  border: 2px solid white;
+  border-radius: 50%;
+}
+
+/* front */
+.card .front {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.flipped .front {
+  opacity: 1; /* Frente visível quando a carta for virada */
+}
+
+/* back */
+.card .back {
+  position: absolute;
+  background-color: rgb(147, 147, 223);
+  background: url("img/teste-bolha.png") no-repeat center /cover;
+  border: 2px solid white;
+  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+  transition: opacity 0.4s ease;
+}
+
+.flipped .back {
+  opacity: 0; /* Verso invisível quando a carta for virada */
+}
+
+
+/* tentei fazer a animação ser diferente pra cartas impares pra n ficar muito estranho mas não funcionou */
+div.card:nth-child(odd){
+  animation-direction: reverse;
+}
+
+@keyframes bounce {
+  0%, 100%{
+    transform: translateX(0);
+  }
+  50%{
+    transform: translateX(10px);
+  }
+}
