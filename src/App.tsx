@@ -30,13 +30,13 @@ const cardStock: Card[] = [
 	createCard("gancho")
 ]
 
+// ============= Moving =============
+
 const bubbleDimensions = [3, 6];
 
-// =============
-// Moving
-// =============
-
 function lerp(start: Posic, end: Posic, t: number): Posic {
+
+  /* Calcula uma posição intermediária entre dois pontos de acordo com um coeficiente t */
 
   return [
     start[0] + (end[0] - start[0]) * t,
@@ -50,11 +50,15 @@ let lastTime: (number | null) = null; // Para controlar o tempo decorrido
 
 const randomCard = (cards: Card[]): Card => {
 
+  /* Dado um array de cartas retorna uma carta aleatória */
+
 	const length = cards.length;
 	const index = Math.floor(Math.random() * length);
 
 	return cards[index];
 }
+
+// =================================
 
 // =============
 
@@ -72,7 +76,7 @@ function App() {
   const [choiceTwo, setChoiceTwo] = useState<Card | null>(null)
   const [disabled, setDisabled] = useState<boolean>(false)
 
-	// Animação
+	// Moving
 	const [movingCards, setMovingCards] = useState<(Card | null)[]>([null, null])
 	const [movingPositions, setMovingPositions] = useState<(Posic | null)[]>([null, null])
 
@@ -82,14 +86,17 @@ function App() {
 
 	const indexToPosic = (index: Posic): Posic => {
 
+    /* Converte um índece de linha e coluna em uma posição baseada em porcentagem*/
+
 		return [
 			(100 * index[0]) / bubbleDimensions[0],
 			(100 * index[1]) / bubbleDimensions[1]
 		];
 	}
 
-  // Função para embaralhar as cartas e resetar o estado do jogo
   const newGame = () => {
+    
+    // Função para embaralhar as cartas e resetar o estado do jogo
 
     //embaralha as cartas
 		const cardStockCopy1 = cardStock.map(card => createCard(card.name))
@@ -101,11 +108,14 @@ function App() {
 		for (let card of shuffledCards)
 			card.id = id++;
 
+        // Definir a posição de cada um em um "grade" de posições
 		for (let card of shuffledCards) {
 
+            // Convertendo id em coluna e linha
 			const column = card.id % bubbleDimensions[0];
 			const row = Math.floor(card.id / bubbleDimensions[0]);
-			
+            
+            // Definindo posição em porcentagens, de acordo com coluna e linha (será usado dentro de "SingleCard")
 			card.posic = indexToPosic([column, row]);
 		}
 
@@ -118,14 +128,17 @@ function App() {
     setScore([0, 0]) // Resetando a pontuação dos jogadores
   }
 
-  //Seleção de Cartas nas variaveis de estado choice one ou two
   const handleChoice = (card: Card) => {
+    
+    //Seleção de Cartas nas variaveis de estado choice one ou two
+
     if (card.id === choiceOne?.id) return; //tratamento de erro
     choiceOne ? setChoiceTwo(card) : setChoiceOne(card)
   }
 
-	//reseta o turno
   const resetTurn = (isMatch: boolean) => {
+    
+    // reseta o turno
 
     setChoiceOne(null)
     setChoiceTwo(null)
@@ -140,6 +153,8 @@ function App() {
 
 	const animate = (time: number) => {
 
+    /* Atualiza a posição das cartas em movimento, quadro a quadro, causando uma animação */ 
+
 		if (lastTime == null) 
 			lastTime = time;
 	
@@ -150,35 +165,47 @@ function App() {
 	
 		if (t < 1) {
 
-			// Interolar posições
+			// Interpolar posições
 			const current0 = lerp(movingPositions[0]!, movingPositions[1]!, t);
 			const current1 = lerp(movingPositions[1]!, movingPositions[0]!, t);
-	
-			// Atualizar as posições dos elementos
-			movingCards[0]!.posic = current0;
-			movingCards[1]!.posic = current1;
 
+      // Aualizar posição das cartas
 			const updatedCards = cards.map(card => {
 				
 				if (card === movingCards[0]) 
-					return { ...card, posic: current0 }; // Atualiza a posição da carta 0
+					return { ...card, posic: current0 };
 				
 				if (card === movingCards[1])
 					return { ...card, posic: current1 }; 
 				
-				return card; // Retorna as outras cartas sem alteração
+				return card;
 			});
 				
 			setCards(updatedCards);
-			requestAnimationFrame(animate); // Continua a animação
+      // Chama o próximo quadro
+			requestAnimationFrame(animate); 
 			
 		} else {
 
-			// Resetar coeficiente de interpolação e anular tempo
+			// Garantir que os elementos estão exatamente nas posições finais
+			const updatedCardsFinal = cards.map(card => {
+				
+				if (card === movingCards[0]) 
+					return { ...card, posic: movingPositions[1]! };
+				
+				if (card === movingCards[1])
+					return { ...card, posic: movingPositions[0]! }; 
+				
+				return card;
+			});
+
+      setCards(updatedCardsFinal)
+
+      // Resetar coeficiente de interpolação e anular tempo
 			t = 0;
 			lastTime = null;
-	
-			// Garantir que os elementos estão exatamente nas posições finais
+
+      // Resetar variáveis
 			setMovingCards([null, null]);
 			setMovingPositions([null, null]);
 		}
@@ -188,13 +215,17 @@ function App() {
 	// UseEffect
 	// ============= 
   
-	//Começa um novo jogo automaticamente
   useEffect(() => {
+    
+    //Começa um novo jogo automaticamente
+
     newGame()
   }, [])
 
-  //verificação se a carta da match ou não
   useEffect(() => {
+    
+    //verificação se a carta da match ou não
+
     if (choiceOne && choiceTwo) {
       setDisabled(true)
       if (choiceOne.name === choiceTwo.name) {
@@ -225,8 +256,6 @@ function App() {
 	useEffect(() => {
 
 		if (turns > 0) {
-
-			console.log("turno")
 	
 			// Se não estiver acontecendo movimento
 			if (movingPositions[0] == null) {
@@ -243,11 +272,12 @@ function App() {
 	}, [turns]);
 
 	useEffect(() => {
+
+    /* Ao mudar moving positions, verifica e inicia a animação */
 		
 		if (movingPositions[0] != null)
 			requestAnimationFrame(animate);
 		
-
 	}, [movingPositions]);
 
   return (

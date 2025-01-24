@@ -21,8 +21,9 @@ export default function SingleCard({ card, handleChoice, flipped, disabled }: Si
   const odd = card.id % 2 == 1;
   const flippedString = flipped ? "true" : "false"; 
   
+  // Estilo que sobrescreverá parcialmente o estilo definido no arquivo css
+  // Definindo a posição dele dentro do div, em porcentagem
   const overwritePosic = { 
-    
     top: `${card.posic[0]}%`, 
     left: `${card.posic[1]}%`
   }
