@@ -3,18 +3,18 @@ import './App.css'
 import SingleCard from './components/SingleCard.tsx'
 
 type Player = number;
-
 type Score = [number, number];
+export type Posic = [number, number];
 
 export interface Card {
 	name: string;
   matched: boolean;
   id: number;
+	posic: Posic;
 }
 
-let id = 0;
 const createCard = (name: string): Card => {
-	return { name: name, matched: false, id: id++ };
+	return { name: name, matched: false, id: -1, posic: [0, 0] };
 }
 
 const cardStock: Card[] = [
@@ -30,7 +30,40 @@ const cardStock: Card[] = [
 	createCard("gancho")
 ]
 
+const bubbleDimensions = [3, 6];
+
+// =============
+// Moving
+// =============
+
+function lerp(start: Posic, end: Posic, t: number): Posic {
+
+  return [
+    start[0] + (end[0] - start[0]) * t,
+    start[1] + (end[1] - start[1]) * t
+  ];
+}
+
+let t: number = 0; // Tempo para interpolação (vai de 0 a 1)
+const duration: number = 2000; // Duração da animação em mili segundos
+let lastTime: (number | null) = null; // Para controlar o tempo decorrido
+
+const randomCard = (cards: Card[]): Card => {
+
+	const length = cards.length;
+	const index = Math.floor(Math.random() * length);
+
+	return cards[index];
+}
+
+// =============
+
 function App() {
+
+	// ============
+	// State
+	// ============
+
   const [cards, setCards] = useState<Card[]>([])
   const [turns, setTurns] = useState<number>(0)
   const [playerTurn, setPlayerTurn] = useState<Player>(0) // Para alternar entre jogador 1 e 2
@@ -39,22 +72,42 @@ function App() {
   const [choiceTwo, setChoiceTwo] = useState<Card | null>(null)
   const [disabled, setDisabled] = useState<boolean>(false)
 
+	// Animação
+	const [movingCards, setMovingCards] = useState<(Card | null)[]>([null, null])
+	const [movingPositions, setMovingPositions] = useState<(Posic | null)[]>([null, null])
+
+	// =============
+	// Definições
+	// =============
+
+	const indexToPosic = (index: Posic): Posic => {
+
+		return [
+			(100 * index[0]) / bubbleDimensions[0],
+			(100 * index[1]) / bubbleDimensions[1]
+		];
+	}
+
   // Função para embaralhar as cartas e resetar o estado do jogo
   const newGame = () => {
+
     //embaralha as cartas
+		const cardStockCopy1 = cardStock.map(card => createCard(card.name))
+		const cardStockCopy2 = cardStock.map(card => createCard(card.name))
+    const shuffledCards = [...cardStockCopy1, ...cardStockCopy2].sort(() => Math.random() - 0.5);
 
-    const cardCopy = cardStock.map( card => {
-      const cardCpy = {...card};
-      return cardCpy;
-    })
+		// Definir ids únicos
+		let id = 0;
+		for (let card of shuffledCards)
+			card.id = id++;
 
-		const cardCopies = cardStock.map( card => { 
-			const cardCopy = { ...card };
-			cardCopy.id += cardStock.length; // Garantindo que cópias terão id único
-			return cardCopy;
-		}) 
+		for (let card of shuffledCards) {
 
-    const shuffledCards = [...cardCopy, ...cardCopies].sort(() => Math.random() - 0.5);
+			const column = card.id % bubbleDimensions[0];
+			const row = Math.floor(card.id / bubbleDimensions[0]);
+			
+			card.posic = indexToPosic([column, row]);
+		}
 
     // Resetando as variáveis de estado para começar um novo jogo
     setChoiceOne(null)
@@ -70,6 +123,75 @@ function App() {
     if (card.id === choiceOne?.id) return; //tratamento de erro
     choiceOne ? setChoiceTwo(card) : setChoiceOne(card)
   }
+
+	//reseta o turno
+  const resetTurn = (isMatch: boolean) => {
+
+    setChoiceOne(null)
+    setChoiceTwo(null)
+    setTurns(prevTurns => prevTurns + 1)
+    setDisabled(false)
+
+    // Alterna o jogador apenas se o jogador errar
+    if (!isMatch) {
+      setPlayerTurn(prev => (prev === 0 ? 1 : 0))
+    }
+  }
+
+	const animate = (time: number) => {
+
+		if (lastTime == null) 
+			lastTime = time;
+	
+		const deltaTime = (time - lastTime!);
+		lastTime = time
+
+		t += deltaTime / duration;
+	
+		if (t < 1) {
+
+			// Interolar posições
+			const current0 = lerp(movingPositions[0]!, movingPositions[1]!, t);
+			const current1 = lerp(movingPositions[1]!, movingPositions[0]!, t);
+	
+			// Atualizar as posições dos elementos
+			movingCards[0]!.posic = current0;
+			movingCards[1]!.posic = current1;
+
+			const updatedCards = cards.map(card => {
+				
+				if (card === movingCards[0]) 
+					return { ...card, posic: current0 }; // Atualiza a posição da carta 0
+				
+				if (card === movingCards[1])
+					return { ...card, posic: current1 }; 
+				
+				return card; // Retorna as outras cartas sem alteração
+			});
+				
+			setCards(updatedCards);
+			requestAnimationFrame(animate); // Continua a animação
+			
+		} else {
+
+			// Resetar coeficiente de interpolação e anular tempo
+			t = 0;
+			lastTime = null;
+	
+			// Garantir que os elementos estão exatamente nas posições finais
+			setMovingCards([null, null]);
+			setMovingPositions([null, null]);
+		}
+	}
+
+	// =============
+	// UseEffect
+	// ============= 
+  
+	//Começa um novo jogo automaticamente
+  useEffect(() => {
+    newGame()
+  }, [])
 
   //verificação se a carta da match ou não
   useEffect(() => {
@@ -100,23 +222,33 @@ function App() {
     }
   }, [choiceOne, choiceTwo])
 
-  //reseta o turno
-  const resetTurn = (isMatch: boolean) => {
-    setChoiceOne(null)
-    setChoiceTwo(null)
-    setTurns(prevTurns => prevTurns + 1)
-    setDisabled(false)
+	useEffect(() => {
 
-    // Alterna o jogador apenas se o jogador errar
-    if (!isMatch) {
-      setPlayerTurn(prev => (prev === 0 ? 1 : 0))
-    }
-  }
+		if (turns > 0) {
 
-  //Começa um novo jogo automaticamente
-  useEffect(() => {
-    newGame()
-  }, [])
+			console.log("turno")
+	
+			// Se não estiver acontecendo movimento
+			if (movingPositions[0] == null) {
+
+				// Sortear cartas
+				const movingCardsAux = [randomCard(cards), randomCard(cards)];
+
+				// Definir como cartas a serem movidas
+				setMovingCards(movingCardsAux);
+				setMovingPositions(movingCardsAux.map(card => card?.posic));
+			}
+		}
+	
+	}, [turns]);
+
+	useEffect(() => {
+		
+		if (movingPositions[0] != null)
+			requestAnimationFrame(animate);
+		
+
+	}, [movingPositions]);
 
   return (
     <div className="App">

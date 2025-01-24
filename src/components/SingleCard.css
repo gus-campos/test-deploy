@@ -3,7 +3,7 @@
   height: 100px;
   transition: transform 0.3s ease;
   animation: bounce 3s linear infinite;
-  position: relative; /* Necessário para o posicionamento absoluto da frente e verso */
+  position: absolute; /* Necessário para o posicionamento absoluto da frente e verso */
 }
 
 .card img {
@@ -23,8 +23,12 @@
   transition: opacity 0.4s ease;
 }
 
-.flipped .front {
+.card[data-flipped="true"] .front {
   opacity: 1; /* Frente visível quando a carta for virada */
+}
+
+.card[data-flipped="true"] .back {
+    opacity: 0; /* Verso invisível quando a carta for virada */
 }
 
 /* back */
@@ -39,14 +43,6 @@
   opacity: 1;
   transition: opacity 0.4s ease;
 }
-
-.flipped .back {
-  opacity: 0; /* Verso invisível quando a carta for virada */
-}
-
-
-/* tentei fazer a animação ser diferente pra cartas impares pra n ficar muito estranho mas não funcionou */
-
 
 @keyframes bounce {
   0%, 100%{
