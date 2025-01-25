@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import './App.css'
 import SingleCard from './components/SingleCard.tsx'
+import GameOver from './components/GameOver.tsx';
 
 type Player = number;
 type Score = [number, number];
@@ -75,6 +76,10 @@ function App() {
   const [choiceOne, setChoiceOne] = useState<Card | null>(null)
   const [choiceTwo, setChoiceTwo] = useState<Card | null>(null)
   const [disabled, setDisabled] = useState<boolean>(false)
+  //gerenciar game over
+  const [gameOver, setGameOver] = useState<boolean>(false)
+  const [winner, setWinner] = useState<string>("")
+  const [hidden,setHidden] = useState<boolean>(true)
 
 	// Moving
 	const [movingCards, setMovingCards] = useState<(Card | null)[]>([null, null])
@@ -130,6 +135,7 @@ function App() {
     movingPositions[0] = null
     cancelAnimationFrame
     setDisabled(false)
+    setHidden(true)
   }
 
   const handleChoice = (card: Card) => {
@@ -286,6 +292,27 @@ function App() {
 		
 	}, [movingPositions]);
 
+  //Gerenciamento de vencedores
+  useEffect(()=>{
+    if(cards.every(card=>card.matched)){
+      setGameOver(true);
+      if(gameOver){
+        setHidden(false);
+      }
+      //talvez else set hidden true
+      console.log("abobora",hidden, gameOver)
+    }
+    //determina o vencedor
+    if(score[0] > score[1]){
+      setWinner('Jogador 1');
+    }else if(score[1] > score[0]){
+      setWinner('Jogador 2');
+    }else{
+      setWinner('Empate!');
+    }
+    
+  },[cards,score]);
+
   return (
     <div className="App">
       <div className="heading">
@@ -314,6 +341,13 @@ function App() {
         <p>Jogador 1: {score[0]}</p>
         <p>Jogador 2: {score[1]}</p>
       </div>
+
+      <GameOver
+       winner = {winner} 
+       newGame = {newGame}
+       hidden = {hidden}
+      />
+
     </div>
   )
 }
