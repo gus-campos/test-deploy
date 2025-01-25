@@ -1,3 +1,7 @@
+body{
+  background-color: #6c89cc;
+}
+
 .card {
   width: 100px;
   height: 100px;
@@ -11,6 +15,10 @@
   display: block;
   border: 2px solid white;
   border-radius: 50%;
+}
+ /* tirar seleção de imagens */
+.card img::selection {
+  background: transparent;
 }
 
 .card[data-odd="false"] {

@@ -86,7 +86,7 @@ function App() {
 
 	const indexToPosic = (index: Posic): Posic => {
 
-    /* Converte um índece de linha e coluna em uma posição baseada em porcentagem*/
+    /* Converte um índice de linha e coluna em uma posição baseada em porcentagem*/
 
 		return [
 			(100 * index[0]) / bubbleDimensions[0],
@@ -196,6 +196,7 @@ function App() {
 				if (card === movingCards[1])
 					return { ...card, posic: movingPositions[0]! }; 
 				
+        setDisabled(false); // habilitar cartas para clique após a animação acabar
 				return card;
 			});
 
@@ -271,12 +272,13 @@ function App() {
 	
 	}, [turns]);
 
-	useEffect(() => {
-
+	useEffect(() => {    
     /* Ao mudar moving positions, verifica e inicia a animação */
 		
-		if (movingPositions[0] != null)
+		if (movingPositions[0] != null){
 			requestAnimationFrame(animate);
+      setDisabled(true); //desabilitar cartas enquanto a animação de troca está sendo executada!
+    }
 		
 	}, [movingPositions]);
 
