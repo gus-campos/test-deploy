@@ -7,7 +7,6 @@ interface GameOverProps {
 }
 
 export default function GameOver({ winner, newGame, hidden}: GameOverProps){
-    console.log("aaa",hidden)
     if(hidden){
         return(null)
     }

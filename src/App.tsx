@@ -300,7 +300,6 @@ function App() {
         setHidden(false);
       }
       //talvez else set hidden true
-      console.log("abobora",hidden, gameOver)
     }
     //determina o vencedor
     if(score[0] > score[1]){
