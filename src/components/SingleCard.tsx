@@ -10,6 +10,7 @@ interface SingleCardProps {
 }
 
 const getImagePath = (name: string): string  => `./img/${name}.png`;
+const backImage = "img/teste-bolha.png"
 
 export default function SingleCard({ card, handleChoice, flipped, disabled }: SingleCardProps) {
 
@@ -30,7 +31,7 @@ export default function SingleCard({ card, handleChoice, flipped, disabled }: Si
 
   return (
     <div className='card' data-odd={odd} data-flipped={flippedString} style={overwritePosic}> 
-        <div className="back"></div>
+        <img className="back" src={backImage}></img>
         <img className='front' src={getImagePath(card.name)} onClick={handleClick} alt='card front' />
     </div>
   )

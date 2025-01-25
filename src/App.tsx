@@ -273,7 +273,9 @@ function App() {
 
 				// Sortear cartas
 				const movingCardsAux = [randomCard(cards), randomCard(cards)];
-
+        while(movingCards[0] == movingCards[1])
+          movingCards[1] = randomCard(cards)
+        
 				// Definir como cartas a serem movidas
 				setMovingCards(movingCardsAux);
 				setMovingPositions(movingCardsAux.map(card => card?.posic));

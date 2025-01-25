@@ -40,8 +40,7 @@
 /* back */
 .card .back {
   position: absolute;
-  background-color: rgb(147, 147, 223);
-  background: url("img/teste-bolha.png") no-repeat center /cover;
+  
   border: 2px solid white;
   border-radius: 50%;
   width: 100%;
