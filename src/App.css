@@ -1,5 +1,13 @@
+
+body{
+  background-color: #6c89cc;
+  width: 75%;
+  margin: 40px auto;  
+}
+  
+
 .App {
-  max-width: 860px;
+  max-width: 80%;
   margin: 40px auto;
   /* tirar seleção de imagens */
   -webkit-user-select: none; /* Safari */
