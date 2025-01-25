@@ -126,6 +126,10 @@ function App() {
     setTurns(0)
     setPlayerTurn(0) // Jogador 1 começa após cada novo jogo
     setScore([0, 0]) // Resetando a pontuação dos jogadores
+    setMovingPositions([null,null])
+    movingPositions[0] = null
+    cancelAnimationFrame
+    setDisabled(false)
   }
 
   const handleChoice = (card: Card) => {
