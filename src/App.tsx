@@ -12,7 +12,9 @@ export interface Card {
   matched: boolean;
   id: number;
 	posic: Posic;
-}
+} 
+
+
 
 const createCard = (name: string): Card => {
 	return { name: name, matched: false, id: -1, posic: [0, 0] };
